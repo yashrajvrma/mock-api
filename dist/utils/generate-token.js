@@ -1,4 +1,3 @@
-import prisma from "../config/db.js";
 import ApiError from "./api-error.js";
 import jwt from "jsonwebtoken";
 export const generateAccessToken = async (data) => {
