@@ -1,14 +1,10 @@
 import type { Request, Response } from "express";
 import ApiError from "../../utils/api-error.js";
-import bcrypt from "bcrypt";
 import prisma from "../../config/db.js";
-import {
-  generateAccessToken,
-  generateRefreshToken,
-} from "../../utils/generate-token.js";
+
 import ApiResponse from "../../utils/api-response.js";
 import AsyncHandler from "../../utils/async-handler.js";
-import jwt, { decode } from "jsonwebtoken";
+
 import { GoogleGenAI } from "@google/genai";
 
 export const createChat = AsyncHandler(async (req, res) => {
