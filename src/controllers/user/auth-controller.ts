@@ -1,49 +1,44 @@
 import type { Request, Response } from "express";
-import {
-  userSignInSchema,
-  userSignUpSchema,
-} from "../../schema/auth-schema.js";
 import ApiError from "../../utils/api-error.js";
 import bcrypt from "bcrypt";
-import prisma from "../../config/db-config.js";
+import prisma from "../../config/db.js";
 import {
   generateAccessToken,
   generateRefreshToken,
 } from "../../utils/generate-token.js";
 import ApiResponse from "../../utils/api-response.js";
-import { saltRounds } from "../../utils/constants/index.js";
 import AsyncHandler from "../../utils/async-handler.js";
 import jwt, { decode } from "jsonwebtoken";
 
 export const signIn = AsyncHandler(async (req, res) => {
   console.log("BODY =>", req.body);
 
-  const { phoneNum, password } = userSignInSchema.parse(req.body);
+  const { email, password } = req.body;
 
-  console.log(phoneNum, password);
+  console.log(email, password);
 
-  if (!phoneNum) {
-    throw new ApiError(400, "Mobile number is required");
+  if (!email) {
+    throw new ApiError(400, "Email is required");
   }
+
   if (!password) {
     throw new ApiError(400, "Password is required");
   }
 
   const isValidUser = await prisma.user.findUnique({
     where: {
-      phoneNum,
+      email,
     },
     select: {
       id: true,
       fullName: true,
-      phoneNum: true,
+      email: true,
       password: true,
-      role: true,
     },
   });
 
   if (!isValidUser) {
-    throw new ApiError(400, `No account found with ${phoneNum}`);
+    throw new ApiError(400, `No account found with ${email}`);
   }
 
   const isPasswordCorrect = await bcrypt.compare(
@@ -57,8 +52,7 @@ export const signIn = AsyncHandler(async (req, res) => {
 
   const accessToken = await generateAccessToken({
     id: isValidUser.id,
-    fullName: isValidUser.fullName,
-    role: isValidUser.role,
+    email: isValidUser.email,
   });
 
   const refreshToken = await generateRefreshToken({
@@ -84,42 +78,38 @@ export const signIn = AsyncHandler(async (req, res) => {
   return res.json(
     new ApiResponse(200, {
       fullName: isValidUser.fullName,
-      role: isValidUser.role,
+      email: isValidUser.email,
       accessToken: accessToken,
     })
   );
 });
 
 export const signUp = AsyncHandler(async (req, res) => {
-  const { fullName, phoneNum, password, role } = userSignUpSchema.parse(
-    req.body
-  );
+  const { fullName, email, password } = req.body;
 
   const isExistingUser = await prisma.user.findUnique({
     where: {
-      phoneNum,
+      email,
     },
   });
 
   if (isExistingUser) {
-    throw new ApiError(400, `User already exists with Mobile no ${phoneNum}`);
+    throw new ApiError(400, `User already exists with Mobile no ${email}`);
   }
 
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
+  const hashedPassword = await bcrypt.hash(password, 10);
 
   const newUser = await prisma.user.create({
     data: {
       fullName,
-      phoneNum,
+      email,
       password: hashedPassword,
-      role,
     },
   });
 
   const accessToken = await generateAccessToken({
     id: newUser.id,
-    fullName: newUser.fullName,
-    role: newUser.role,
+    email: newUser.email,
   });
 
   const refreshToken = await generateRefreshToken({
@@ -148,8 +138,7 @@ export const signUp = AsyncHandler(async (req, res) => {
       {
         id: newUser.id,
         fullName: newUser.fullName,
-        phoneNum: newUser.phoneNum,
-        role: newUser.role,
+        email: newUser.email,
         accessToken,
       },
       "User creaated successfully"
@@ -190,8 +179,7 @@ export const refreshAccessToken = AsyncHandler(async (req, res) => {
 
   const accessToken = await generateAccessToken({
     id: user.id,
-    fullName: user.fullName,
-    role: user.role,
+    email: user.email,
   });
 
   const refreshToken = await generateRefreshToken({

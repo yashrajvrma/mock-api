@@ -1,14 +1,12 @@
 import ApiError from "../utils/api-error.js";
 import AsyncHandler from "../utils/async-handler.js";
 import jwt from "jsonwebtoken";
-import prisma from "../config/db-config.js";
-import type { Role } from "@prisma/client";
+import prisma from "../config/db.js";
 
 interface User {
   id: string;
-  phoneNum: string;
-  fullName: string;
-  role: Role;
+  email: string;
+  fullName?: string;
 }
 
 declare global {
@@ -46,15 +44,15 @@ export const verifyJWT = AsyncHandler(async (req, res, next) => {
     let user: User | null;
 
     if (typeof decodedToken != "string" && "id" in decodedToken) {
+      // @ts-ignore
       user = await prisma.user.findUnique({
         where: {
-          id: decodedToken.id,
+          id: decodedToken.id as string,
         },
         select: {
           id: true,
           fullName: true,
-          phoneNum: true,
-          role: true,
+          email: true,
         },
       });
     } else {

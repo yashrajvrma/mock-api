@@ -1,11 +1,10 @@
-import prisma from "../config/db-config.js";
+import prisma from "../config/db.js";
 import ApiError from "./api-error.js";
 import jwt from "jsonwebtoken";
 
 interface TokenDataProps {
   id: string;
-  fullName: string;
-  role: string;
+  email: string;
 }
 
 export const generateAccessToken = async (data: TokenDataProps) => {
@@ -19,11 +18,11 @@ export const generateAccessToken = async (data: TokenDataProps) => {
     );
   }
 
+  // @ts-ignore
   const accessToken = jwt.sign(
     {
       id: data.id,
-      fullName: data.fullName,
-      role: data.role,
+      email: data.email,
     },
     accessTokenSecret,
     {
@@ -44,7 +43,7 @@ export const generateRefreshToken = async ({ id }: { id: string }) => {
       "Internal server error: refresh token secret not set"
     );
   }
-
+  // @ts-ignore
   const refreshToken = jwt.sign(
     {
       id,
