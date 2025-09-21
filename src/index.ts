@@ -40,6 +40,9 @@ app.use("/v1/api/chat", chatRouter);
 import messageRouter from "./routes/message-route.js";
 app.use("/v1/api/message", messageRouter);
 
+import mockRouter from "./routes/mock-route.js";
+app.use("/v1/api/mock", mockRouter);
+
 // error middleware
 import errorHandler from "./middlewares/error-middleware.js";
 app.use(errorHandler);
