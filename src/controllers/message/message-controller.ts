@@ -105,9 +105,25 @@ export const generateMsg = AsyncHandler(async (req, res) => {
     throw new ApiError(400, "chatId, message and role are required");
   }
 
+  const chat = await prisma.chat.findUnique({
+    where: {
+      id: chatId as string,
+    },
+  });
+
+  if (!chat?.id) {
+    // create chat
+    const createChat = await prisma.chat.create({
+      data: {
+        id: chatId,
+        userId: userId!,
+      },
+    });
+  }
+
   // 1. Save user message
   const createUserMsg = await prisma.message.create({
-    data: { chatId, content: message, role },
+    data: { chatId: chatId as string, content: message, role },
   });
 
   // 2. Prepare conversation history
