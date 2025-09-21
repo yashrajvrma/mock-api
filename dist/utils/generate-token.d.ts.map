@@ -1,1 +1,0 @@
-{"version":3,"file":"generate-token.d.ts","sourceRoot":"","sources":["../../src/utils/generate-token.ts"],"names":[],"mappings":"AAGA,UAAU,cAAc;IACtB,EAAE,EAAE,MAAM,CAAC;IACX,KAAK,EAAE,MAAM,CAAC;CACf;AAED,eAAO,MAAM,mBAAmB,GAAU,MAAM,cAAc,mBAwB7D,CAAC;AAEF,eAAO,MAAM,oBAAoB,GAAU,QAAQ;IAAE,EAAE,EAAE,MAAM,CAAA;CAAE,mBAsBhE,CAAC"}
