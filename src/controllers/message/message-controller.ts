@@ -99,7 +99,7 @@ const ai = new GoogleGenAI({
  */
 export const generateMsg = AsyncHandler(async (req, res) => {
   const { chatId, message, role } = req.body;
-  const userId = req.user!.id;
+  const userId = req.user?.id;
 
   if (!chatId || !message || !role) {
     throw new ApiError(400, "chatId, message and role are required");
@@ -110,22 +110,27 @@ export const generateMsg = AsyncHandler(async (req, res) => {
       id: chatId as string,
     },
   });
-
-  if (!chat?.id) {
+  let chat_id;
+  if (!chat || !chat.id) {
     // create chat
     const createChat = await prisma.chat.create({
       data: {
-        id: chatId,
+        id: chatId as string,
         userId: userId!,
       },
     });
+
+    chat_id = createChat.id;
   }
 
   // 1. Save user message
   const createUserMsg = await prisma.message.create({
-    data: { chatId: chatId as string, content: message, role },
+    data: { chatId: chat_id!, content: message, role },
   });
 
+  console.log("user msg got created");
+
+  console.log("preperaing history");
   // 2. Prepare conversation history
   const history = await prisma.message.findMany({
     where: { chatId },
@@ -194,8 +199,14 @@ export const generateMsg = AsyncHandler(async (req, res) => {
 
   // 4. Save assistant reply
   const assistantMsg = await prisma.message.create({
-    data: { chatId, content: assistantReply, role: "ASSISTANT" },
+    data: {
+      chatId: chat_id!,
+      content: assistantReply,
+      role: "ASSISTANT",
+    },
   });
+
+  console.log("save assitan msg");
 
   const updatePreviousMessage = await prisma.message.update({
     where: {
