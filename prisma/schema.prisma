@@ -18,6 +18,11 @@ enum Role {
   USER
 }
 
+enum Status {
+  PENDING
+  COMPLETED
+}
+
 model User {
   id String @id @default(uuid())
 
@@ -56,6 +61,7 @@ model Message {
 
   content   String
   role      Role
+  status    Status   @default(PENDING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

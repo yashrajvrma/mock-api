@@ -37,6 +37,9 @@ app.use("/v1/api/auth", authRouter);
 import chatRouter from "./routes/chat-routes.js";
 app.use("/v1/api/chat", chatRouter);
 
+import messageRouter from "./routes/message-route.js";
+app.use("/v1/api/message", messageRouter);
+
 // error middleware
 import errorHandler from "./middlewares/error-middleware.js";
 app.use(errorHandler);
