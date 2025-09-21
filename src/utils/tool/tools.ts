@@ -24,7 +24,7 @@ export const createMockRouteFn: FunctionDeclaration = {
       path: { type: Type.STRING },
       response: { type: Type.OBJECT },
     },
-    required: ["path", "response"],
+    required: ["method", "path", "response"],
   },
 };
 
