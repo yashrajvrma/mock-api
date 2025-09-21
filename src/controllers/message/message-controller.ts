@@ -8,6 +8,7 @@ import {
   type FunctionDeclaration,
 } from "@google/genai";
 import { systemInstruction } from "../../utils/constants/prompt.js";
+import ApiResponse from "../../utils/api-response.js";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
@@ -174,5 +175,19 @@ export const generateMsg = AsyncHandler(async (req, res) => {
     data: { chatId, content: assistantReply, role: "ASSISTANT" },
   });
 
-  res.json({ userMsg: createUserMsg, assistantMsg });
+  const updatePreviousMessage = await prisma.message.update({
+    where: {
+      id: createUserMsg.chatId,
+    },
+    data: {
+      status: "COMPLETED",
+    },
+  });
+
+  // res.json({ userMsg: createUserMsg, assistantMsg });
+  return res.json(
+    new ApiResponse(200, {
+      modelMessage: assistantReply,
+    })
+  );
 });
