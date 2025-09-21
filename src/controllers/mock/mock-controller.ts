@@ -2,6 +2,7 @@ import express, { response } from "express";
 import prisma from "../../config/db.js";
 import ApiError from "../../utils/api-error.js";
 import ApiResponse from "../../utils/api-response.js";
+import AsyncHandler from "../../utils/async-handler.js";
 
 const router = express.Router();
 
@@ -45,6 +46,31 @@ router.all("/:chatId/*rest", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+export const fetchMockApi = AsyncHandler(async (req, res) => {
+  const { chatId } = req.body;
+
+  if (!chatId) {
+    throw new ApiError(400, "Chat Id is required");
+  }
+
+  const userId = req.user?.id!;
+
+  const fetchAllApi = await prisma.mockRoute.findMany({
+    where: {
+      userId,
+      chatId: chatId as string,
+    },
+    select: {
+      id: true,
+      chatId: true,
+      method: true,
+      path: true,
+    },
+  });
+
+  return res.json(new ApiResponse(200, fetchAllApi));
 });
 
 export default router;
