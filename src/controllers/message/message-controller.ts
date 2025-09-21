@@ -183,7 +183,7 @@ export const generateMsg = AsyncHandler(async (req, res) => {
 
   const updatePreviousMessage = await prisma.message.update({
     where: {
-      id: createUserMsg.chatId,
+      id: createUserMsg.id,
     },
     data: {
       status: "COMPLETED",
