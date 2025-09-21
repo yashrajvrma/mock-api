@@ -10,7 +10,6 @@
     "module": "nodenext",
     "target": "esnext",
     "types": [],
-    "typeRoots": ["./node_modules/@types", "./src/types"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
